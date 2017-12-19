@@ -1,12 +1,13 @@
 import os, os.path
 import re
 import csv
+from nltk.tokenize import word_tokenize
 
 def read_corpus(csv_corpus_path):
 	"""
 	Reads a csv-file and returns a list of dicts. 
 	Each dict represents one corpus file.
-	Keys: ['LABEL', 'FILENAME', 'STARS', 'TITLE', 'DATE', 'AUTHOR', 'PRODUCT', 'REVIEW']
+	Keys: ['LABEL', 'FILENAME', 'STARS', 'TITLE', 'DATE', 'AUTHOR', 'PRODUCT', 'REVIEW', 'TOKENS']
 	"""
 	corpus = []
 
@@ -38,7 +39,7 @@ def convert_corpus(corpus_path, out):
 
 	with open(out, 'w') as csvfile:
 
-		fieldnames = ['LABEL', 'FILENAME', 'STARS', 'TITLE', 'DATE', 'AUTHOR', 'PRODUCT', 'REVIEW']
+		fieldnames = ['LABEL', 'FILENAME', 'STARS', 'TITLE', 'DATE', 'AUTHOR', 'PRODUCT', 'REVIEW', 'TOKENS']
 		writer = csv.DictWriter(csvfile, fieldnames)
 
 		writer.writeheader()
@@ -60,8 +61,12 @@ def convert_corpus(corpus_path, out):
 
 			data[fieldnames[1]] = file_path.split("/")[-1]
 
-			for tag in fieldnames[2:]:
+			for tag in fieldnames[2:-1]:
 				data[tag] = get_tag_content(tag, s)
+
+			# tokenization
+			tokens = word_tokenize(data['REVIEW'])
+			data["TOKENS"] = tokens
 
 			writer.writerow(data)
 
@@ -83,13 +88,14 @@ def get_tag_content(tag, text):
 
 
 if __name__ == '__main__':
-	"""
-	corpus_path = "../corpus/SarcasmAmazonReviewsCorpus"
-	convert_corpus(corpus_path, "corpus.csv")
+	
+	#corpus_path = "../corpus/SarcasmAmazonReviewsCorpus"
+	#convert_corpus(corpus_path, "corpus.csv")
 
-	corpus = read_corpus("corpus.csv")
-	print("Corpus size: "+str(len(corpus)))
-	"""
+	#corpus = read_corpus("corpus.csv")
+	#print("Corpus size: "+str(len(corpus)))
+
+
 
 
 
