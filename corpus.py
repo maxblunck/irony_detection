@@ -15,7 +15,12 @@ def read_corpus(csv_corpus_path):
 		reader = csv.DictReader(csvfile)
 
 		for row in reader:
-			corpus.append(row)
+			data = row
+
+			# tokenization
+			data["TOKENS"] = word_tokenize(row['REVIEW'])
+
+			corpus.append(data)
 
 	return corpus
 
@@ -39,7 +44,7 @@ def convert_corpus(corpus_path, out):
 
 	with open(out, 'w') as csvfile:
 
-		fieldnames = ['LABEL', 'FILENAME', 'STARS', 'TITLE', 'DATE', 'AUTHOR', 'PRODUCT', 'REVIEW', 'TOKENS']
+		fieldnames = ['LABEL', 'FILENAME', 'STARS', 'TITLE', 'DATE', 'AUTHOR', 'PRODUCT', 'REVIEW']
 		writer = csv.DictWriter(csvfile, fieldnames)
 
 		writer.writeheader()
@@ -61,12 +66,8 @@ def convert_corpus(corpus_path, out):
 
 			data[fieldnames[1]] = file_path.split("/")[-1]
 
-			for tag in fieldnames[2:-1]:
+			for tag in fieldnames[2:]:
 				data[tag] = get_tag_content(tag, s)
-
-			# tokenization
-			tokens = word_tokenize(data['REVIEW'])
-			data["TOKENS"] = tokens
 
 			writer.writerow(data)
 
@@ -88,13 +89,14 @@ def get_tag_content(tag, text):
 
 
 if __name__ == '__main__':
-	
-	#corpus_path = "../corpus/SarcasmAmazonReviewsCorpus"
-	#convert_corpus(corpus_path, "corpus.csv")
+	"""
+	corpus_path = "../corpus/SarcasmAmazonReviewsCorpus"
+	convert_corpus(corpus_path, "corpus.csv")
 
-	#corpus = read_corpus("corpus.csv")
-	#print("Corpus size: "+str(len(corpus)))
-
+	corpus = read_corpus("corpus.csv")
+	print("Corpus size: "+str(len(corpus)))
+	print(corpus[0].keys())
+	"""
 
 
 
