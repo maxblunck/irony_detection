@@ -5,6 +5,7 @@ import ngram_feature
 import numpy as np
 from sklearn import svm
 from sklearn.tree import DecisionTreeClassifier
+import postagger
 
 
 def create_vector(corpus_instance, vocabulary=None):
@@ -14,6 +15,7 @@ def create_vector(corpus_instance, vocabulary=None):
     single corpus instance)
     """
     f1 = ngram_feature.extract(corpus_instance, vocabulary)
+    # f2 = postagger.to_bigram_vector(corpus_instance, pos_vocab)
     f4 = sent_rating_feature.extract(corpus_instance)
 
     return np.concatenate((f1,f4))
@@ -31,6 +33,10 @@ if __name__ == '__main__':
     # vocabularies
     unigram_vocab = ngram_feature.get_vocabulary(train_set, 1)
     bigram_vocab = ngram_feature.get_vocabulary(train_set, 2)
+    
+    # pos_bags
+    # bigram_pos_vocab = postagger.get_pos_vocabulary(train_set) (entspricht corpus in postagger.py)
+    
 
     # inputs:
     train_inputs = [create_vector(el, unigram_vocab)

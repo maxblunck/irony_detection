@@ -119,6 +119,16 @@ def to_bag_of_words(corpus):
 #fun fact: len(bag_of_words) is 25325 for corpus.csv
 
 
+def extract(corpus_instance, pos_vocab):
+    "nimmt einzelnes dict, und gibt featurevector der größe len(bag-bigram) zurück"
+    pass
+
+
+def get_pos_vocabulary(corpus):
+    "geht über ganzes corpus, gibt bigram-bag zurück"
+    pass
+
+
 if __name__ == '__main__':
     corpus = read_corpus("minicorpus.csv")
     tagged_corpus = corpus_pos_tagger(corpus)
@@ -130,3 +140,4 @@ if __name__ == '__main__':
     
     for vector in corpus_vector:
         print(vector)
+   
