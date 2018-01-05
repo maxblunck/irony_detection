@@ -8,14 +8,14 @@ from sklearn.tree import DecisionTreeClassifier
 import postagger
 
 
-def create_vector(corpus_instance, vocabulary=None):
+def create_vector(corpus_instance, vocabulary=None, pos_vocabulary=None):
     """
     Calls all feature extraction programms and combines
     resulting arrays to a single input vector (for a 
     single corpus instance)
     """
     f1 = ngram_feature.extract(corpus_instance, vocabulary)
-    # f2 = postagger.to_bigram_vector(corpus_instance, pos_vocab)
+    # f2 = postagger.to_bigram_vector(corpus_instance, pos_vocabulary)
     f4 = sent_rating_feature.extract(corpus_instance)
 
     return np.concatenate((f1,f4))
