@@ -13,9 +13,10 @@ def create_vector(corpus_instance, vocabulary=None, pos_vocabulary=None):
     Calls all feature extraction programms and combines
     resulting arrays to a single input vector (for a 
     single corpus instance)
+    Example for corpus instance: OrderedDict([('LABEL', '0'), ('FILENAME', '36_19_RPRRQDRSHDV6J.txt'), ('STARS', '5.0'), ('TITLE', etc.
     """
     f1 = ngram_feature.extract(corpus_instance, vocabulary)
-    # f2 = postagger.to_bigram_vector(corpus_instance, pos_vocabulary)
+    #f2 = postagger.extract(corpus_instance, bigram_pos_vocab)
     f4 = sent_rating_feature.extract(corpus_instance)
 
     return np.concatenate((f1,f4))
@@ -35,9 +36,9 @@ if __name__ == '__main__':
     bigram_vocab = ngram_feature.get_vocabulary(train_set, 2)
     
     # pos_bags
-    # bigram_pos_vocab = postagger.get_pos_vocabulary(train_set) (entspricht corpus in postagger.py)
+    bigram_pos_vocab = postagger.get_pos_vocabulary(train_set)
+    #print(bigram_pos_vocab) #already lookin' good
     
-
     # inputs:
     train_inputs = [create_vector(el, unigram_vocab)
                     for el in train_set]  # 1000 vectors
@@ -52,6 +53,7 @@ if __name__ == '__main__':
     print("Number of features per train sample: {}".format(len(train_inputs[0])))
     print("Unigram vocab size:                  {}".format(len(unigram_vocab)))
     print("Bigram vocab size:                   {}".format(len(bigram_vocab)))
+    print("POS-Bigram vocab size:               {}".format(len(bigram_pos_vocab)))
 
     # training
 

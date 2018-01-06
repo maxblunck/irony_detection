@@ -1,10 +1,46 @@
 import nltk
 from nltk.tokenize import word_tokenize
 from corpus import read_corpus
+import csv
 
 """
-TODO
-- something useful to do with the feature vectors
+These functions are meant to be accessed from training_testing.py
+"""
+
+"""
+not yet functional
+"""
+def extract(corpus_instance, bigram_pos_vocab):
+    corpus_instance_formatted = []
+    reader = csv.DictReader(corpus_instance)
+    
+    for row in reader:
+        data = row
+    
+        corpus_instance_formatted.append(data)
+        
+    corpus_instance_pos_bigrams = corpus_pos_tagger(corpus_instance)
+    corpus_instance_vector = []
+    
+    for bigram in bigram_pos_vocab:
+        corpus_instance_vector.append(corpus_instance_pos_bigrams.count(bigram))
+
+    return corpus_instance_vector
+
+
+"""
+already functional
+"""
+def get_pos_vocabulary(corpus):
+    tagged_corpus = corpus_pos_tagger(corpus)
+    pos_unigrams = tagged_corpus_to_pos_unigrams(tagged_corpus)
+    pos_bigrams = pos_unigrams_to_bigrams(pos_unigrams)
+    pos_vocab = to_bag_of_bigrams(pos_bigrams)
+    return pos_vocab
+
+
+"""
+These functions are intended for internal use.
 """
 
 """
@@ -16,9 +52,13 @@ def corpus_pos_tagger(corpus):
     temp_entry = []
     
     for entry in corpus:
+        if not isinstance(entry, dict):
+            continue
+        
         temp_entry = nltk.pos_tag(word_tokenize(str(entry['REVIEW'])))
         tagged_corpus.append(temp_entry)
         temp_entry = []
+        
     return (tagged_corpus)
 
 
@@ -89,55 +129,45 @@ def to_bigram_vector(bag_of_bigrams, corpus): #corpus is the bigram_list
     return review_vector_list
 
 
-"""
-The functions below are intended to be used on token-level (bag of words)
-"""
-def to_token_vector(bag_of_words, corpus):
-    review_vector_list = []
-    
-    for entry in corpus:
-        review_vector = []
-        review = word_tokenize(str(entry['REVIEW']))
-        
-        for word in bag_of_words:
-            review_vector.append(review.count(word))
-            
-        review_vector_list.append(review_vector)
-        
-    return review_vector_list
-
-
-def to_bag_of_words(corpus):
-    bag_of_words = []
-    
-    for entry in corpus:
-        for word in word_tokenize(str(entry['REVIEW'])):
-            if word not in bag_of_words:
-                bag_of_words.append(word)
-                
-    return bag_of_words
-#fun fact: len(bag_of_words) is 25325 for corpus.csv
-
-
-def extract(corpus_instance, pos_vocab):
-    "nimmt einzelnes dict, und gibt featurevector der größe len(bag-bigram) zurück"
-    pass
-
-
-def get_pos_vocabulary(corpus):
-    "geht über ganzes corpus, gibt bigram-bag zurück"
-    pass
-
-
 if __name__ == '__main__':
     corpus = read_corpus("minicorpus.csv")
-    tagged_corpus = corpus_pos_tagger(corpus)
-    pos_unigrams = tagged_corpus_to_pos_unigrams(tagged_corpus)
-    pos_bigrams = pos_unigrams_to_bigrams(pos_unigrams)
-    bag_of_bigrams = to_bag_of_bigrams(pos_bigrams)
-
-    corpus_vector = to_bigram_vector(bag_of_bigrams, pos_bigrams)
+    bigram_pos_vocab = get_pos_vocabulary(corpus)
+    corpus_instance = "1,36_12_R3W1O661T65OBH.txt,3.0,It's Just A Broom - No Handle!,'October 6, 2004',D. Richardson,WOLF-Garten Outdoor Broom B40M (Lawn & Patio),'Unless you want to sweep on your hands and knees, make sure you purchase the handle separately!'"
     
-    for vector in corpus_vector:
-        print(vector)
+    f4 = extract(corpus_instance, bigram_pos_vocab)
+    #print(f4)
+    #corpus_vector = to_bigram_vector(bag_of_bigrams, pos_bigrams)
+    
+    #for vector in corpus_vector:
+        #print(vector)
+        
+        
+"""
+The functions below are intended to be used on token-level (bag of words) and possibly obsolete
+"""
+#def to_token_vector(bag_of_words, corpus):
+    #review_vector_list = []
+    
+    #for entry in corpus:
+        #review_vector = []
+        #review = word_tokenize(str(entry['REVIEW']))
+        
+        #for word in bag_of_words:
+            #review_vector.append(review.count(word))
+            
+        #review_vector_list.append(review_vector)
+        
+    #return review_vector_list
+
+
+#def to_bag_of_words(corpus):
+    #bag_of_words = []
+    
+    #for entry in corpus:
+        #for word in word_tokenize(str(entry['REVIEW'])):
+            #if word not in bag_of_words:
+                #bag_of_words.append(word)
+                
+    #return bag_of_words
+#fun fact: len(bag_of_words) is 25325 for corpus.csv
    
