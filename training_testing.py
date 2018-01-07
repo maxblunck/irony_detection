@@ -56,19 +56,32 @@ if __name__ == '__main__':
     # training
 
     # SVM
-    svm_classifier = svm.SVC()
+    svm_classifier = svm.SVC(C=200.0) # large C: smaller-margin hyperplane
     svm_classifier.fit(train_inputs, train_labels)
-    predictions = svm_classifier.predict(test_inputs)
+
+    print("\nSVM: Score on train Data:")
+    print(svm_classifier.score(train_inputs, train_labels))
+    # predictions = svm_classifier.predict(train_inputs)
+    # print("Predictions: \n {}".format(predictions))
+    # print("Targets:     \n {}".format(train_labels))
+
+    print("\nSVM: Score on test Data:")
     print(svm_classifier.score(test_inputs, test_labels))
-    print("Predictions: \n {}".format(predictions))
-    print("Targets:     \n {}".format(test_labels))
+    # predictions = svm_classifier.predict(test_inputs)
+    # print("Predictions: \n {}".format(predictions))
+    # print("Targets:     \n {}".format(test_labels))
 
     # Trees
     tree_clf = DecisionTreeClassifier()
     tree_clf.fit(train_inputs, train_labels)
-    predictions = tree_clf.predict(test_inputs)
+
+    print("\nDTree: Score on train Data:")
+    print(tree_clf.score(train_inputs, train_labels))
+    # predictions = tree_clf.predict(test_inputs)
+    # print("Predictions: \n {}".format(predictions))
+    # print("Targets:     \n {}".format(test_labels))
+
+    print("\nDTree: Score on test Data:")
     print(tree_clf.score(test_inputs, test_labels))
-    print("Predictions: \n {}".format(predictions))
-    print("Targets:     \n {}".format(test_labels))
 
 
