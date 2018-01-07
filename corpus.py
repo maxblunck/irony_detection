@@ -2,6 +2,7 @@ import os, os.path
 import re
 import csv
 from nltk.tokenize import word_tokenize
+from random import shuffle
 
 def read_corpus(csv_corpus_path):
 	"""
@@ -25,7 +26,7 @@ def read_corpus(csv_corpus_path):
 	return corpus
 
 
-def convert_corpus(corpus_path, out):
+def convert_corpus(corpus_path, out, shuffle_corpus=False):
 	"""
 	Takes root path of raw Filatrova corpus and converts it into a single csv file.
 	
@@ -41,6 +42,9 @@ def convert_corpus(corpus_path, out):
 
 	        	if parent == "Regular" or parent == "Ironic":
 	        		corpus_files.append(os.path.join(root, name))
+
+	if shuffle_corpus == True:
+		shuffle(corpus_files)
 
 	with open(out, 'w') as csvfile:
 
@@ -92,12 +96,12 @@ if __name__ == '__main__':
 	"""
 	corpus_path = "../corpus/SarcasmAmazonReviewsCorpus"
 	convert_corpus(corpus_path, "corpus.csv")
+	convert_corpus(corpus_path, "corpus_shuffled.csv", shuffle_corpus=True)
 
 	corpus = read_corpus("corpus.csv")
 	print("Corpus size: "+str(len(corpus)))
 	print(corpus[0].keys())
 	"""
-
 
 
 
