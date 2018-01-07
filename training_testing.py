@@ -17,10 +17,13 @@ def create_vector(corpus_instance, vocabulary=None, pos_vocabulary=None):
     Example for corpus instance: OrderedDict([('LABEL', '0'), ('FILENAME', '36_19_RPRRQDRSHDV6J.txt'), ('STARS', '5.0'), ('TITLE', etc.
     """
     f1 = ngram_feature.extract(corpus_instance, vocabulary)
-    #f2 = postagger.extract(corpus_instance, bigram_pos_vocab)
+    f2 = postagger.extract(corpus_instance, pos_vocabulary)
     f4 = sent_rating_feature.extract(corpus_instance)
 
-    return np.concatenate((f1,f4))
+    print(f2)
+    print(len(f2))
+
+    return np.concatenate((f1, f2, f4))
 
 
 def train_multiple(classifiers, train_input, train_labels):
