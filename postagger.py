@@ -1,36 +1,32 @@
 import nltk
 from nltk.tokenize import word_tokenize
 from corpus import read_corpus
-import csv
 
 """
 These functions are meant to be accessed from training_testing.py
 """
 
 """
-not yet functional
+TODO:
+    * get rid of tmp_list
+    * vectors look plausible when tested on small corpus,
+        but apparently there are up to 60 instances per bigram
+        in a review (possible, but should be looked into)
 """
 def extract(corpus_instance, bigram_pos_vocab):
-    corpus_instance_formatted = []
-    reader = csv.DictReader(corpus_instance)
-    
-    for row in reader:
-        data = row
-    
-        corpus_instance_formatted.append(data)
-        
-    corpus_instance_pos_bigrams = corpus_pos_tagger(corpus_instance)
+    tmp_list = []
+    tmp_list.append(corpus_instance)
+    corpus_instance_pos_tagged = corpus_pos_tagger(tmp_list)
+    corpus_instance_pos_unigrams = tagged_corpus_to_pos_unigrams(corpus_instance_pos_tagged)
+    corpus_instance_pos_bigrams = pos_unigrams_to_bigrams(corpus_instance_pos_unigrams)
     corpus_instance_vector = []
     
     for bigram in bigram_pos_vocab:
-        corpus_instance_vector.append(corpus_instance_pos_bigrams.count(bigram))
-
+        corpus_instance_vector.append(corpus_instance_pos_bigrams[0].count(bigram)) 
+        #print(str(bigram) + ": " + str(corpus_instance_pos_bigrams[0].count(bigram)) + "\n") 
     return corpus_instance_vector
 
 
-"""
-already functional
-"""
 def get_pos_vocabulary(corpus):
     tagged_corpus = corpus_pos_tagger(corpus)
     pos_unigrams = tagged_corpus_to_pos_unigrams(tagged_corpus)
@@ -58,8 +54,8 @@ def corpus_pos_tagger(corpus):
         temp_entry = nltk.pos_tag(word_tokenize(str(entry['REVIEW'])))
         tagged_corpus.append(temp_entry)
         temp_entry = []
-        
-    return (tagged_corpus)
+    
+    return tagged_corpus
 
 
 """
@@ -130,11 +126,21 @@ def to_bigram_vector(bag_of_bigrams, corpus): #corpus is the bigram_list
 
 
 if __name__ == '__main__':
+    """
+    function calls for testing purposes on a small corpus
+    """
     corpus = read_corpus("minicorpus.csv")
+    #for thing in corpus:
+        #print(thing)
     bigram_pos_vocab = get_pos_vocabulary(corpus)
-    corpus_instance = "1,36_12_R3W1O661T65OBH.txt,3.0,It's Just A Broom - No Handle!,'October 6, 2004',D. Richardson,WOLF-Garten Outdoor Broom B40M (Lawn & Patio),'Unless you want to sweep on your hands and knees, make sure you purchase the handle separately!'"
+    corpus_instance = corpus[0]
+    print(bigram_pos_vocab)
+    print(extract(corpus_instance, bigram_pos_vocab))
     
-    f4 = extract(corpus_instance, bigram_pos_vocab)
+    """
+    misc. tests
+    """
+    #f4 = extract(corpus_instance, bigram_pos_vocab)
     #print(f4)
     #corpus_vector = to_bigram_vector(bag_of_bigrams, pos_bigrams)
     
@@ -143,7 +149,7 @@ if __name__ == '__main__':
         
         
 """
-The functions below are intended to be used on token-level (bag of words) and possibly obsolete
+The functions below are intended to be used on token-level (bag of words) and are possibly obsolete
 """
 #def to_token_vector(bag_of_words, corpus):
     #review_vector_list = []
