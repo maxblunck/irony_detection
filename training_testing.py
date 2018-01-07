@@ -48,9 +48,9 @@ if __name__ == '__main__':
     #print(pos_bigram_vocab) #already lookin' good
     
     # inputs:
-    train_inputs = [create_vector(el, unigram_vocab)
+    train_inputs = [create_vector(el, unigram_vocab, pos_bigram_vocab)
                     for el in train_set]  # 1000 vectors
-    test_inputs = [create_vector(el, unigram_vocab)
+    test_inputs = [create_vector(el, unigram_vocab, pos_bigram_vocab)
                    for el in test_set]  # 254 vectors
 
     # labels
