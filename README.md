@@ -1,18 +1,36 @@
-Moin!
+# Sarcasm Detection In Amazon Reviews
 
-Hallo
+## About
 
-# Software Projekt WS17 - Sarcasm Detection
+Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
 
+## Prerequirements 
 
-## (Current) Dependencies:
+We suggest using a virtual environment in order to use this program.
 
-Installation via 'pip install [package]'
+	# apt install python-virtualenv
 
-- nltk
-- numpy
-- vaderSentiment (2.5)
-- requests
-- textblob
-- sklearn
-- scipy
+You then need to create a new virtual environment (in this example, it is named virtual-env), preferably in the project's folder:
+
+	$ virtualenv virtual-env
+	$ source virtual-env/bin/activate
+
+## Requirements
+
+The program requires NLTK, NumPy, SciPy, SciKit Learn, requests, textblob and vaderSentiment.
+Please note that SciPy and NumPy need to be installed before SciKit Learn.
+
+    $ pip install --upgrade pip
+	$ pip install nltk
+	$ pip install numpy
+	$ pip install scipy
+	$ pip install sklearn
+	$ pip install requests
+	$ pip install textblob
+	$ pip install vaderSentiment
+	
+## Starting
+
+The command for using the program is as follows: 
+
+	$ python ...
