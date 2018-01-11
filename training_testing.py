@@ -1,12 +1,14 @@
 import corpus
-from random import shuffle
 import sent_rating_feature
 import ngram_feature
+import pos_feature
 import numpy as np
 from sklearn import svm
 from sklearn import tree
+from sklearn import naive_bayes
+from sklearn import linear_model
 from sklearn.model_selection import cross_val_score
-import pos_feature
+
 
 
 def create_vector(corpus_instance, vocabulary=None, pos_vocabulary=None):
@@ -26,6 +28,15 @@ def create_vector(corpus_instance, vocabulary=None, pos_vocabulary=None):
 def train_multiple(classifiers, train_input, train_labels):
     for classifier in classifiers:
         classifier.fit(train_input, train_labels)
+
+
+def score_multiple(classifiers, train_input, train_labels):
+    scores = []
+    for classifier in classifiers:
+        accuracy = cross_val_score(classifier, train_inputs, train_labels, cv=5, scoring='accuracy').mean()
+        f1 = cross_val_score(classifier, train_inputs, train_labels, cv=5, scoring='f1').mean()
+        scores.append(accuracy, f1)
+    return scores 
 
 
 if __name__ == '__main__':
@@ -64,22 +75,30 @@ if __name__ == '__main__':
     # ML
 
     # init
-    svm_clf = svm.SVC(C=200.0) # large C: smaller-margin hyperplane
+    svm_clf = svm.SVC(C=200.0, kernel='linear') # large C: smaller-margin hyperplane
     tree_clf = tree.DecisionTreeClassifier()
+    nb_clf = naive_bayes.MultinomialNB()
+    lr_clf = linear_model.LogisticRegression()
 
     # training
-    train_multiple([svm_clf, tree_clf], train_inputs, train_labels)
+    train_multiple([svm_clf, tree_clf, nb_clf, lr_clf], train_inputs, train_labels)
     
     # validation
     svm_acc = cross_val_score(svm_clf, train_inputs, train_labels, cv=5, scoring='accuracy').mean()
     tree_acc = cross_val_score(tree_clf, train_inputs, train_labels, cv=5, scoring='accuracy').mean()
+    nb_acc = cross_val_score(nb_clf, train_inputs, train_labels, cv=5, scoring='accuracy').mean()
+    lr_acc = cross_val_score(lr_clf, train_inputs, train_labels, cv=5, scoring='accuracy').mean()
 
     svm_f1 = cross_val_score(svm_clf, train_inputs, train_labels, cv=5, scoring='f1').mean()
     tree_f1 = cross_val_score(tree_clf, train_inputs, train_labels, cv=5, scoring='f1').mean()
+    nb_f1 = cross_val_score(nb_clf, train_inputs, train_labels, cv=5, scoring='f1').mean()
+    lr_f1 = cross_val_score(lr_clf, train_inputs, train_labels, cv=5, scoring='f1').mean()
 
     print("\n--Cross Validation Scores-- ")
     print("\nSVM: Accuracy: {}, F1-Score: {}".format(svm_acc, svm_f1))
     print("\nTree: Accuracy: {}, F1-Score: {}".format(tree_acc, tree_f1))
+    print("\nN. Bayes: Accuracy: {}, F1-Score: {}".format(nb_acc, nb_f1))
+    print("\nLog. Regression: Accuracy: {}, F1-Score: {}".format(lr_acc, lr_f1))
 
     # testing
     # print("\nSVM: Score on test Data:")
@@ -89,5 +108,3 @@ if __name__ == '__main__':
     # print(tree_clf.score(test_inputs, test_labels))
 
     # predictions = svm_classifier.predict(train_inputs)
-
-
