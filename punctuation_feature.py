@@ -10,13 +10,13 @@ def extract(corpus_instance):
     corpus_instance_vector = []
 
     for punctuation in relevant_punctuation:
-        corpus_instance_vector.append(review.count(punctuation))
+        corpus_instance_vector.append(review.count(punctuation)/len(review))
         #print((str(punctuation) + ": " + str(review.count(punctuation))))
 
     for token in review:
         if token.isupper() and len(token) > 1:
             allcaps += 1
-    corpus_instance_vector.append(allcaps)
+    corpus_instance_vector.append(allcaps/len(review))
 
     return corpus_instance_vector
 
