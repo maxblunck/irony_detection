@@ -1,10 +1,9 @@
 from collections import Counter
-from corpus import read_corpus
+import corpus
 from ngram_feature import get_vocabulary, extract
 
 
 def extract_surface_patterns(corpus, frequency_per_million):
-	corpus = read_corpus(corpus)
 	tokens = get_tokens_lower(corpus)
 	frequencies = frequency_breakdown(tokens)
 	threshold = frequency_threshold(tokens, frequency_per_million)
@@ -49,14 +48,8 @@ def substitute_content_words(corpus, hfws):
 	return extended_corpus
 
 
-if __name__ == '__main__':
-
-	extended_corpus = extract_surface_patterns("corpus.csv", 1000)
-	
-	vocabulary = get_vocabulary(extended_corpus, "SURFACE_PATTERNS", 1)
-
-	for i in extended_corpus:
-		vector = extract(i, "SURFACE_PATTERNS", vocabulary)	
-		for el in vector:
-			if el == 1:
-				print(el)
+# if __name__ == '__main__':
+# 	corpus = corpus.read_corpus("corpus_shuffled.csv")
+# 	extended_corpus = extract_surface_patterns(corpus, 1000)
+# 	vocabulary = get_vocabulary(extended_corpus, 'SURFACE_PATTERNS', 2)
+# 	vec = extract(extended_corpus[0], 'SURFACE_PATTERNS', vocabulary)

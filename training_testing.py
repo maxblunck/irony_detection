@@ -3,6 +3,7 @@ import sent_rating_feature
 import ngram_feature
 import pos_feature
 import punctuation_feature
+import surface_patterns
 import numpy as np
 from sklearn import svm
 from sklearn import tree
@@ -11,20 +12,20 @@ from sklearn import linear_model
 from sklearn.model_selection import cross_val_score
 
 
-
-def create_vector(corpus_instance, vocabulary=None, pos_vocabulary=None):
+def create_vector(corpus_instance, vocabulary=None, pos_vocabulary=None, surface_vocabulary=None):
     """
     Calls all feature extraction programms and combines
     resulting arrays to a single input vector (for a
     single corpus instance)
-    Example for corpus instance: OrderedDict([('LABEL', '0'), ('FILENAME', '36_19_RPRRQDRSHDV6J.txt'), ('STARS', '5.0'), ('TITLE', etc.
+    Example for corpus instance: OrderedDict([('LABEL', '0'), ('STARS', '5.0'), etc.
     """
-    f1 = ngram_feature.extract(corpus_instance, vocabulary)
+    f1 = ngram_feature.extract(corpus_instance, 'REVIEW', vocabulary)
     f2 = pos_feature.extract(corpus_instance, pos_vocabulary)
+    f3 = ngram_feature.extract(corpus_instance, 'SURFACE_PATTERNS', surface_vocabulary)
     f4 = sent_rating_feature.extract(corpus_instance)
     f5 = punctuation_feature.extract(corpus_instance)
 
-    return np.concatenate((f1, f2, f4, f5))
+    return np.concatenate((f1, f2, f3, f4, f5))
 
 
 def train_multiple(classifiers, train_input, train_labels):
@@ -44,25 +45,23 @@ def score_multiple(classifiers, train_input, train_labels):
 if __name__ == '__main__':
 
     corpus = corpus.read_corpus("corpus_shuffled.csv")
+    extended_corpus = surface_patterns.extract_surface_patterns(corpus, 1000)
 
     # split data set 80:20
-    train_set = corpus[:1000]
-    test_set = corpus[1000:]
+    train_set = extended_corpus[:1000]
+    test_set = extended_corpus[1000:]
 
     # vocabularies
-    unigram_vocab = ngram_feature.get_vocabulary(train_set, 1)
-    bigram_vocab = ngram_feature.get_vocabulary(train_set, 2)
-
-    # pos_bags
+    unigram_vocab = ngram_feature.get_vocabulary(train_set, 'REVIEW', 1)
+    bigram_vocab = ngram_feature.get_vocabulary(train_set, 'REVIEW', 2)
     pos_bigram_vocab = pos_feature.get_pos_vocabulary(train_set)
-
-    # relevant punctuation is hard-coded in punctuation_feature.py
+    surface_bigram_vocab = ngram_feature.get_vocabulary(train_set, 'SURFACE_PATTERNS', 2)
 
     # inputs:
-    train_inputs = [create_vector(el, unigram_vocab, pos_bigram_vocab)
+    train_inputs = [create_vector(el, bigram_vocab, pos_bigram_vocab, surface_bigram_vocab)
                     for el in train_set]  # 1000 vectors
-    test_inputs = [create_vector(el, unigram_vocab, pos_bigram_vocab)
-                   for el in test_set]  # 254 vectors
+    #test_inputs = [create_vector(el, bigram_vocab, pos_bigram_vocab, surface_bigram_vocab)
+    #               for el in test_set]  # 254 vectors
 
     # labels
     train_labels = np.array([int(el['LABEL']) for el in train_set])  # 1000 labels
@@ -73,6 +72,7 @@ if __name__ == '__main__':
     print("Unigram vocab size:                  {}".format(len(unigram_vocab)))
     print("Bigram vocab size:                   {}".format(len(bigram_vocab)))
     print("POS-Bigram vocab size:               {}".format(len(pos_bigram_vocab)))
+    print("Surface Patterns-Bigram vocab size:  {}".format(len(surface_bigram_vocab)))
 
     # TODO Pickle/outsource
 
