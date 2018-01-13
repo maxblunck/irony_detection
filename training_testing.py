@@ -2,6 +2,7 @@ import corpus
 import sent_rating_feature
 import ngram_feature
 import pos_feature
+import punctuation_feature
 import numpy as np
 from sklearn import svm
 from sklearn import tree
@@ -14,15 +15,16 @@ from sklearn.model_selection import cross_val_score
 def create_vector(corpus_instance, vocabulary=None, pos_vocabulary=None):
     """
     Calls all feature extraction programms and combines
-    resulting arrays to a single input vector (for a 
+    resulting arrays to a single input vector (for a
     single corpus instance)
     Example for corpus instance: OrderedDict([('LABEL', '0'), ('FILENAME', '36_19_RPRRQDRSHDV6J.txt'), ('STARS', '5.0'), ('TITLE', etc.
     """
     f1 = ngram_feature.extract(corpus_instance, vocabulary)
     f2 = pos_feature.extract(corpus_instance, pos_vocabulary)
     f4 = sent_rating_feature.extract(corpus_instance)
+    f5 = punctuation_feature.extract(corpus_instance)
 
-    return np.concatenate((f1, f2, f4))
+    return np.concatenate((f1, f2, f4, f5))
 
 
 def train_multiple(classifiers, train_input, train_labels):
@@ -36,7 +38,7 @@ def score_multiple(classifiers, train_input, train_labels):
         accuracy = cross_val_score(classifier, train_inputs, train_labels, cv=5, scoring='accuracy').mean()
         f1 = cross_val_score(classifier, train_inputs, train_labels, cv=5, scoring='f1').mean()
         scores.append(accuracy, f1)
-    return scores 
+    return scores
 
 
 if __name__ == '__main__':
@@ -50,10 +52,12 @@ if __name__ == '__main__':
     # vocabularies
     unigram_vocab = ngram_feature.get_vocabulary(train_set, 1)
     bigram_vocab = ngram_feature.get_vocabulary(train_set, 2)
-    
+
     # pos_bags
     pos_bigram_vocab = pos_feature.get_pos_vocabulary(train_set)
-    
+
+    # relevant punctuation is hard-coded in punctuation_feature.py
+
     # inputs:
     train_inputs = [create_vector(el, unigram_vocab, pos_bigram_vocab)
                     for el in train_set]  # 1000 vectors
@@ -82,7 +86,7 @@ if __name__ == '__main__':
 
     # training
     train_multiple([svm_clf, tree_clf, nb_clf, lr_clf], train_inputs, train_labels)
-    
+
     # validation
     svm_acc = cross_val_score(svm_clf, train_inputs, train_labels, cv=5, scoring='accuracy').mean()
     tree_acc = cross_val_score(tree_clf, train_inputs, train_labels, cv=5, scoring='accuracy').mean()
