@@ -9,12 +9,12 @@ def extract(corpus_instance):
 	Returns numpy array of size 1.
 	"""
 	review = corpus_instance["REVIEW"]
-	stars = corpus_instance["STARS"]
+	stars = float(corpus_instance["STARS"])
 
     #sent = get_sent_vader(review)
 	sent = get_sent_textblob(review)
 	
-	if (sent <= 0.0 and stars == "5.0") or (sent > 0.0 and stars == "1.0"):
+	if (sent <= 0.0 and stars > 3.0) or (sent > 0.0 and stars < 3.0):
 		return np.array([1])
 	else:
 		return np.array([0])
