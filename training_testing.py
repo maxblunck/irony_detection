@@ -9,9 +9,10 @@ from sklearn import svm
 from sklearn import tree
 from sklearn import naive_bayes
 from sklearn import linear_model
-from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import cross_val_score, GridSearchCV
 import time
 import pickle
+
 
 def extract_features(training_set, test_set):
 
@@ -58,21 +59,32 @@ def create_vector(corpus_instance, vocabulary=None, pos_vocabulary=None, surface
     return np.concatenate((f1, f2, f3, f4, f5))
 
 
-def train_multiple(classifiers, train_input, train_labels):
+def train_multiple(classifiers, train_inputs, train_labels):
     for classifier in classifiers:
-        classifier.fit(train_input, train_labels)
+        classifier.fit(train_inputs, train_labels)
 
 
-def validate_multiple(classifiers, train_input, train_labels):
+def validate_multiple(classifiers, train_inputs, train_labels):
     print("\n------Cross Validation------")
 
     for classifier in classifiers:
         print("\n{}".format(classifier))
 
-        accuracy = cross_val_score(classifier, train_inputs, train_labels, cv=5, scoring='accuracy').mean()
-        f1 = cross_val_score(classifier, train_inputs, train_labels, cv=5, scoring='f1').mean()
+        accuracy = cross_val_score(classifier, train_inputs, train_labels, cv=3, scoring='accuracy').mean()
+        f1 = cross_val_score(classifier, train_inputs, train_labels, cv=3, scoring='f1').mean()
         
         print("\nAccuracy: {}, F1-Score: {}\n".format(accuracy, f1))
+
+
+def get_best_params(classifier, train_inputs, train_labels):
+    Cs = [0.001, 0.01, 0.1, 1, 10] # large C: smaller-margin hyperplane
+    gammas = [0.001, 0.01, 0.1, 1]
+    param_grid = {'C': Cs, 'gamma' : gammas}
+
+    grid_search = GridSearchCV(classifier, param_grid, cv=3)
+    grid_search.fit(train_inputs, train_labels)
+
+    print("Best parameters: {}".format(grid_search.best_params_))
 
 
 if __name__ == '__main__':
@@ -112,19 +124,20 @@ if __name__ == '__main__':
     # Machine Learning
 
     # init
-    svm_clf = svm.SVC(C=500.0, kernel='linear') # large C: smaller-margin hyperplane
+    svm_clf = svm.SVC(kernel='linear') 
     tree_clf = tree.DecisionTreeClassifier()
     nb_clf = naive_bayes.MultinomialNB()
     lr_clf = linear_model.LogisticRegression()
 
+    get_best_params(svm_clf, train_inputs, train_labels)
+
     # training
-    train_multiple([svm_clf, tree_clf], train_inputs, train_labels) #, nb_clf, lr_clf
-    print("---> Duration Training: {} sec.\n".format(int(time.time()-start_time)))
+    #train_multiple([svm_clf, tree_clf, nb_clf, lr_clf], train_inputs, train_labels)
+    #print("---> Duration Training: {} sec.\n".format(int(time.time()-start_time)))
 
     # validation
-    validate_multiple([svm_clf, tree_clf], train_inputs, train_labels) #, nb_clf, lr_clf
-    print("---> Duration CV: {} sec.".format(int(time.time()-start_time)))
-
+    #validate_multiple([svm_clf], train_inputs, train_labels) #, tree_clf, nb_clf, lr_clf
+    #print("---> Duration CV: {} sec.".format(int(time.time()-start_time)))
 
     # testing
     # print("\nSVM: Score on test Data:")
