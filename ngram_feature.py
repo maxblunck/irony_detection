@@ -15,7 +15,7 @@ def extract(corpus_instance, corpus_dict_key, vocabulary):
 	return vector.toarray()[0]
 
 
-def get_vocabulary(corpus, corpus_dict_key, n):
+def get_vocabulary(corpus, corpus_dict_key, n_range):
 	"""
 	Creates vocabulary based on given corpus.
 	"""
@@ -23,7 +23,7 @@ def get_vocabulary(corpus, corpus_dict_key, n):
 	for line in corpus:
 		all_reviews.append(line[corpus_dict_key])
 
-	vectorizer = CountVectorizer(ngram_range=(n, n))
+	vectorizer = CountVectorizer(ngram_range=n_range)
 	vectorizer.fit(all_reviews)
 
 	return vectorizer.vocabulary_
