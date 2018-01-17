@@ -49,12 +49,13 @@ def extract(corpus_instance):
 			sent_verb = analyser.polarity_scores(verb)['compound']
 			sent_situation = analyser.polarity_scores(situation)['compound']
 
-			print("phrase: {} {} sent verb: {}  sent situation: {}".format(verb, situation, sent_verb, sent_situation))
+			if (sent_verb > 0.0 and sent_situation < 0.0) or (sent_verb < 0.0 and sent_situation > 0.0):
+				print("phrase: {} {} sent verb: {}  sent situation: {}".format(verb, situation, sent_verb, sent_situation))
 
 
 
 if __name__ == '__main__':
-	corpus = corpus.read_corpus("corpus_shuffled.csv")[:100]
+	corpus = corpus.read_corpus("corpus_shuffled.csv")[:1000]
 
 	for instance in corpus:
 		extract(instance)

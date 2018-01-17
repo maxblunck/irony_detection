@@ -17,24 +17,20 @@ import pickle
 def extract_features(training_set, test_set):
 
     # vocabularies
-    unigram_vocab = ngram_feature.get_vocabulary(train_set, 'REVIEW', 1)
-    bigram_vocab = ngram_feature.get_vocabulary(train_set, 'REVIEW', 2)
-    trigram_vocab = ngram_feature.get_vocabulary(train_set, 'REVIEW', 3)
+    n_gram_vocab = ngram_feature.get_vocabulary(train_set, 'REVIEW', (3,3)) # n1==n2!
     pos_bigram_vocab = pos_feature.get_pos_vocabulary(train_set)
-    surface_bigram_vocab = ngram_feature.get_vocabulary(train_set, 'SURFACE_PATTERNS', 2)
+    surface_bigram_vocab = ngram_feature.get_vocabulary(train_set, 'SURFACE_PATTERNS', (4,4))
 
     # inputs:
     print("------Feature Extraction------\n")
-    train_inputs = [create_vector(el, unigram_vocab, pos_bigram_vocab, surface_bigram_vocab)
+    train_inputs = [create_vector(el, n_gram_vocab, pos_bigram_vocab, surface_bigram_vocab)
                     for el in train_set]  # 1000 vectors
-    test_inputs = [create_vector(el, unigram_vocab, pos_bigram_vocab, surface_bigram_vocab)
+    test_inputs = [create_vector(el, n_gram_vocab, pos_bigram_vocab, surface_bigram_vocab)
                    for el in test_set]  # 254 vectors
 
     # stats
     print("Number of train samples:          {}".format(len(train_inputs)))
-    print("Unigram vocab size:               {}".format(len(unigram_vocab)))
-    print("Bigram vocab size:                {}".format(len(bigram_vocab)))
-    print("Trigram vocab size:               {}".format(len(trigram_vocab)))
+    print("N_gram vocab size:                {}".format(len(n_gram_vocab)))
     print("POS-Bigram vocab size:            {}".format(len(pos_bigram_vocab)))
     print("SP-Bigram vocab size:             {}".format(len(surface_bigram_vocab)))
     print("Total features per train sample:  {}".format(len(train_inputs[0])))
@@ -65,7 +61,7 @@ def train_multiple(classifiers, train_inputs, train_labels):
 
 
 def validate_multiple(classifiers, train_inputs, train_labels):
-    print("\n------Cross Validation------")
+    print("\n-------Cross Validation-------")
 
     for classifier in classifiers:
         print("\n{}".format(classifier))
@@ -77,14 +73,20 @@ def validate_multiple(classifiers, train_inputs, train_labels):
 
 
 def get_best_params(classifier, train_inputs, train_labels):
+
+    print("{} \n".format(classifier))
+
     Cs = [0.001, 0.01, 0.1, 1, 10] # large C: smaller-margin hyperplane
     gammas = [0.001, 0.01, 0.1, 1]
-    param_grid = {'C': Cs, 'gamma' : gammas}
+    kernels = ['linear', 'rbf', 'poly']
+
+    param_grid = {'C': Cs, 'gamma' : gammas, 'kernel' : kernels}
 
     grid_search = GridSearchCV(classifier, param_grid, cv=3)
     grid_search.fit(train_inputs, train_labels)
 
     print("Best parameters: {}".format(grid_search.best_params_))
+    print("Best score: {}".format(grid_search.best_score_))
 
 
 if __name__ == '__main__':
@@ -112,7 +114,7 @@ if __name__ == '__main__':
         test_labels = np.array([int(el['LABEL']) for el in test_set])  # 254 labels
 
         # save to pickle
-        pickle.dump([train_inputs, train_labels, test_inputs, test_labels], open("vectors.pickle", "wb"))
+        #pickle.dump([train_inputs, train_labels, test_inputs, test_labels], open("vectors.pickle", "wb"))
 
     else:
         # load from pickle
@@ -124,7 +126,7 @@ if __name__ == '__main__':
     # Machine Learning
 
     # init
-    svm_clf = svm.SVC(kernel='linear') 
+    svm_clf = svm.SVC(C=0.1, gamma=0.001, kernel='linear')
     tree_clf = tree.DecisionTreeClassifier()
     nb_clf = naive_bayes.MultinomialNB()
     lr_clf = linear_model.LogisticRegression()
@@ -136,8 +138,8 @@ if __name__ == '__main__':
     #print("---> Duration Training: {} sec.\n".format(int(time.time()-start_time)))
 
     # validation
-    #validate_multiple([svm_clf], train_inputs, train_labels) #, tree_clf, nb_clf, lr_clf
-    #print("---> Duration CV: {} sec.".format(int(time.time()-start_time)))
+    validate_multiple([svm_clf, tree_clf, nb_clf, lr_clf], train_inputs, train_labels) #, tree_clf, nb_clf, lr_clf
+    print("---> Duration CV: {} sec.".format(int(time.time()-start_time)))
 
     # testing
     # print("\nSVM: Score on test Data:")
