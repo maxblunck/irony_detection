@@ -2,7 +2,10 @@ import os, os.path
 import re
 import csv
 from nltk.tokenize import word_tokenize
+from nltk.stem import WordNetLemmatizer
+import nltk
 from random import shuffle
+
 
 def read_corpus(csv_corpus_path):
 	"""
@@ -20,6 +23,12 @@ def read_corpus(csv_corpus_path):
 
 			# tokenization
 			data["TOKENS"] = word_tokenize(row['REVIEW'])
+
+			# pos-tagging
+			data["POS"] = nltk.pos_tag(data["TOKENS"])
+
+			# lemmatizing
+			data["LEMMAS"] = get_lemmas(data["POS"])
 
 			corpus.append(data)
 
@@ -90,6 +99,28 @@ def get_tag_content(tag, text):
 		raise ValueError("Matching error!")
 
 	return match[0].strip()
+
+
+def get_lemmas(instance_pos_tags):
+	lemmatizer = WordNetLemmatizer()
+	pos_map = {"VB" : "v", "NN" : "n", "JJ" : "a"}
+	lemmas = []
+
+	for pair in instance_pos_tags:
+			token = pair[0]
+			pos_tag = pair[1][0:2]
+
+			simple_pos = "n"
+
+			if pos_tag in pos_map.keys():
+				simple_pos = pos_map[pos_tag]
+
+			lemma = lemmatizer.lemmatize(token, pos=simple_pos)
+			lemmas.append(lemma)
+
+	return lemmas
+
+
 
 
 if __name__ == '__main__':
