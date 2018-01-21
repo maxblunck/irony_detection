@@ -4,6 +4,7 @@ import ngram_feature
 import pos_feature
 import punctuation_feature
 import surface_patterns
+import contrast_feature
 import numpy as np
 from sklearn import svm
 from sklearn import tree
@@ -17,9 +18,9 @@ import pickle
 def extract_features(training_set, test_set):
 
     # vocabularies
-    n_gram_vocab = ngram_feature.get_vocabulary(train_set, 'REVIEW', (3,3)) # n1==n2!
+    n_gram_vocab = ngram_feature.get_vocabulary(train_set, 'REVIEW', (1,1)) # n1==n2!
     pos_bigram_vocab = pos_feature.get_pos_vocabulary(train_set)
-    surface_bigram_vocab = ngram_feature.get_vocabulary(train_set, 'SURFACE_PATTERNS', (4,4))
+    surface_bigram_vocab = ngram_feature.get_vocabulary(train_set, 'SURFACE_PATTERNS', (3,3))
 
     # inputs:
     print("------Feature Extraction------\n")
@@ -51,8 +52,9 @@ def create_vector(corpus_instance, vocabulary=None, pos_vocabulary=None, surface
     f3 = ngram_feature.extract(corpus_instance, 'SURFACE_PATTERNS', surface_vocabulary)
     f4 = sent_rating_feature.extract(corpus_instance)
     f5 = punctuation_feature.extract(corpus_instance)
+    f6 = contrast_feature.extract(corpus_instance)
 
-    return np.concatenate((f1, f2, f3, f4, f5))
+    return np.concatenate((f1, f2, f3, f4, f5, f6))
 
 
 def train_multiple(classifiers, train_inputs, train_labels):
@@ -72,15 +74,9 @@ def validate_multiple(classifiers, train_inputs, train_labels):
         print("\nAccuracy: {}, F1-Score: {}\n".format(accuracy, f1))
 
 
-def get_best_params(classifier, train_inputs, train_labels):
+def get_best_params(classifier, param_grid, train_inputs, train_labels):
 
     print("{} \n".format(classifier))
-
-    Cs = [0.001, 0.01, 0.1, 1, 10] # large C: smaller-margin hyperplane
-    gammas = [0.001, 0.01, 0.1, 1]
-    kernels = ['linear', 'rbf', 'poly']
-
-    param_grid = {'C': Cs, 'gamma' : gammas, 'kernel' : kernels}
 
     grid_search = GridSearchCV(classifier, param_grid, cv=3)
     grid_search.fit(train_inputs, train_labels)
@@ -126,20 +122,40 @@ if __name__ == '__main__':
     # Machine Learning
 
     # init
-    svm_clf = svm.SVC(C=0.1, gamma=0.001, kernel='linear')
+    svm_clf = svm.SVC() # best: C=0.1, gamma=0.001, kernel='linear'
     tree_clf = tree.DecisionTreeClassifier()
     nb_clf = naive_bayes.MultinomialNB()
     lr_clf = linear_model.LogisticRegression()
 
-    get_best_params(svm_clf, train_inputs, train_labels)
+    # validation
+    #validate_multiple([svm_clf, tree_clf, nb_clf, lr_clf], train_inputs, train_labels)
+    #print("---> Duration CV: {} sec.".format(int(time.time()-start_time)))
+
+    # tuning
+    svm_param_grid = {'C': [0.001, 0.01, 0.1, 1, 10],
+                      'gamma' : [0.001, 0.01, 0.1, 1],
+                      'kernel' : ['linear', 'rbf', 'poly']}
+
+    tree_param_grid = {'criterion' : ['gini', 'entropy'],
+                       'max_depth': [9, 6, 3, None],
+                       'max_features': [1, 2, 3, 4, 5, 6, 7, 8, 9, 500],
+                       'min_samples_leaf': randint(1, 9)}
+
+    nb_param_grid = {'alpha' : [0, 0.5, 1.0]}
+
+    lr_param_grid = {'penalty' : ['l1', 'l2'],
+                     'C' : [0.001, 0.01, 0.1, 1, 10]}
+
+    get_best_params(svm_clf, svm_param_grid, train_inputs, train_labels)
+    get_best_params(tree_clf, tree_param_grid, train_inputs, train_labels)
+    get_best_params(nb_clf, nb_param_grid, train_inputs, train_labels)
+    get_best_params(lr_clf, lr_param_grid, train_inputs, train_labels)
+
+    print("---> Duration param search: {} sec.".format(int(time.time()-start_time)))
 
     # training
     #train_multiple([svm_clf, tree_clf, nb_clf, lr_clf], train_inputs, train_labels)
     #print("---> Duration Training: {} sec.\n".format(int(time.time()-start_time)))
-
-    # validation
-    validate_multiple([svm_clf, tree_clf, nb_clf, lr_clf], train_inputs, train_labels) #, tree_clf, nb_clf, lr_clf
-    print("---> Duration CV: {} sec.".format(int(time.time()-start_time)))
 
     # testing
     # print("\nSVM: Score on test Data:")
