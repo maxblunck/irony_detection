@@ -139,7 +139,7 @@ if __name__ == '__main__':
     tree_param_grid = {'criterion' : ['gini', 'entropy'],
                        'max_depth': [9, 6, 3, None],
                        'max_features': [1, 2, 3, 4, 5, 6, 7, 8, 9, 500],
-                       'min_samples_leaf': randint(1, 9)}
+                       'min_samples_leaf': [1, 2, 3, 4, 5, 6, 7, 8, 9]}
 
     nb_param_grid = {'alpha' : [0, 0.5, 1.0]}
 
