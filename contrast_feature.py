@@ -106,9 +106,9 @@ def extract(corpus_instance):
 	return np.array([contrasts])
 
 
-if __name__ == '__main__':
-	corpus = corpus.read_corpus("corpus_shuffled.csv")
+# if __name__ == '__main__':
+# 	corpus = corpus.read_corpus("corpus_shuffled.csv")
 
-	for instance in corpus:
-		extract(instance)
+# 	for instance in corpus:
+# 		extract(instance)
 
