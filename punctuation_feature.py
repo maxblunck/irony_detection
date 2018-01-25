@@ -7,6 +7,7 @@ def extract(corpus_instance):
     #"?!", "!?", "???", "!!!" are no lemmas
     allcaps = 0
     excessive_punctuation = re.compile('[!?][!?]+')
+    html_quotes = re.compile('&quot;')
     review_tokens = (word_tokenize(corpus_instance["TITLE"])) + corpus_instance["TOKENS"]
     review_lemmas = ((corpus_instance["TITLE"] + " " + corpus_instance["REVIEW"]))
 
@@ -22,7 +23,7 @@ def extract(corpus_instance):
     
     corpus_instance_vector.append(len(re.findall(excessive_punctuation, review_lemmas))/len(review_lemmas))
     corpus_instance_vector.append(allcaps/len(review_tokens))
-
+    corpus_instance_vector.append(len(re.findall(html_quotes, review_lemmas))/len(review_tokens))
 
     return corpus_instance_vector
 
@@ -33,5 +34,6 @@ if __name__ == '__main__':
     """
     pass
     #corpus = read_corpus("minicorpus.csv")
-    #corpus_instance = corpus[3]
+    #corpus_instance = corpus[0]
+    #print(corpus_instance["REVIEW"])
     #print(extract(corpus_instance))
