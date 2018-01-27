@@ -2,3 +2,6 @@
 .*\.py.+
 __pycache__
 
+sopro.sublime-project
+sopro.sublime-workspace
+test.py

@@ -32,6 +32,10 @@ def get_pos_vocabulary(corpus):
     pos_unigrams = tagged_corpus_to_pos_unigrams(tagged_corpus)
     pos_bigrams = pos_unigrams_to_bigrams(pos_unigrams)
     pos_vocab = to_bag_of_bigrams(pos_bigrams)
+
+    #print stats
+    print("POS Bigram vocab size:            {}".format(len(pos_vocab)))
+
     return pos_vocab
 
 
