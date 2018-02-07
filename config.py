@@ -2,8 +2,18 @@
 Configuration file
 '''
 
+'''
+Data split ratio:
+- Set to 1.0 to replicate comparison-paper scores (and set validate below)
+- When set to 1.0, be sure to turn off testing
+'''
+split_ratio = 0.8
+
+
 ''' 
-Choose mode
+Choose mode:
+- Set validate to True here, to replicate comparison-paper scores (10-fold cv)
+- If test is set to True, training will also be activated
 '''
 validate = False
 tune = False # takes ~24h
@@ -12,48 +22,66 @@ test = True
 
 
 '''
-Choose wheter input vectors should be extracted again.
-For first time use of programm: Variable needs to be set to True.
-If set to False: Pre-extracted vectors are loaded from pickle file.
+Choose path and files to output results
+- Each will be ovewritten if unchanged to previous run!
 '''
-re_extract = True
+test_result_out = "../results/test_results.csv"
+validation_result_out = "../results/cv_results.csv"
+misclassification_out = "../results/misclassifications.txt"
 
 
 '''
-Choose file to output test results. Path relative to src code
+Evaluation Utilities:
+- plot_weights: visualize top weights (of SVM)
+- log_misclassification: output all missclassfied instances (by SVM)
+- Setting one of the below to True will also activate training
 '''
-test_result_out = "test_results.csv"
+plot_weights = False
+log_misclassifications = True
 
 
 '''
-Select features to be used. Array must have at least one feature:
+Select features to be used. Array must contain at least one feature:
 f1 : n-gram feature
 f2 : pos feature
 f3 : surface-patterns feature
 f4 : sent/rating-contrast feature
 f5 : punctuation feature
-f6 : pos/neg-phrase feature
+f6 : contrast feature
 f7 : number of stars (rating)
-f8 : lemma n-gram feature
-
-best so far ['f1' ,'f4', 'f5', 'f7'] 
 '''
-feature_selection = ['f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8']
+#feature_selection = ['f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7']
+feature_selection = ['f1', 'f3', 'f4', 'f7']
 
 
 '''
-Setting to True will loop through and train/test all possible combinations
-of the features entered in feature_selection.
+Setting to True will loop through & validate/train/test all possible combinations
+of the features given in feature_selection
 '''
-use_all_variants = True
+use_all_variants = False
 
 
 '''
-Choose range of n for bag-of-X features. 
-(1,1): only unigrams; 
-(1,2): uni- + bi-grams
-until fixed: n1==n2!
+Feature Options:
+- Choose range of n for bag-of-X features. 
+	- (1,1): only unigrams; 
+	- (1,2): uni- + bi-grams
+- Choose high-freq. threshold for surface-patterns feature
 '''
-n_range_words = (1,1) 
+n_range_words = (2,2) 
 n_range_surface_patterns = (1,1)
 n_range_lemmas = (1,1)
+sp_threshold = 1000
+
+
+'''
+Print extra stats like vocabulary sizes
+'''
+print_stats = True
+
+
+'''
+Select csv-file containing the corpus (as created with corpus.py)
+'''
+corpus_path = "../corpus/corpus_shuffled.csv"
+

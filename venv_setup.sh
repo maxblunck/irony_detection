@@ -9,4 +9,3 @@ pip install scipy
 pip install sklearn
 pip install requests
 pip install textblob
-pip install vaderSentiment

@@ -4,35 +4,40 @@ import csv
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 import nltk
+import config
+import surface_patterns
 from random import shuffle
+import io
+import sys
 
 
 def read_corpus(csv_corpus_path):
 	"""
-	Reads a csv-file and returns a list of dicts. 
+	Reads a csv-file containing the corpus and returns a list of dicts. 
 	Each dict represents one corpus file.
 	Keys: ['LABEL', 'FILENAME', 'STARS', 'TITLE', 'DATE', 'AUTHOR', 'PRODUCT', 'REVIEW', 'TOKENS']
 	"""
 	corpus = []
 
-	with open(csv_corpus_path) as csvfile:
+	with io.open(csv_corpus_path, encoding="ISO-8859-1") as csvfile:
 		reader = csv.DictReader(csvfile)
 
+		# augment corpus with tokens, pos-tags & lemmas
 		for row in reader:
 			data = row
 
-			# tokenization
 			data["TOKENS"] = word_tokenize(row['REVIEW'])
 
-			# pos-tagging
 			data["POS"] = nltk.pos_tag(data["TOKENS"])
 
-			# lemmatizing
 			data["LEMMAS"] = get_lemmas(data["POS"])
 
 			corpus.append(data)
 
-	return corpus
+	# add surface patterns to corpus data
+	extended_corpus = surface_patterns.extract_surface_patterns(corpus, config.sp_threshold)
+
+	return extended_corpus
 
 
 def convert_corpus(corpus_path, out, shuffle_corpus=False):
@@ -42,6 +47,7 @@ def convert_corpus(corpus_path, out, shuffle_corpus=False):
 	"""
 	corpus_files = []
 
+	# gather all text files of directory
 	for root, dirs, files in os.walk(corpus_path):
 	    
 	    for name in files:
@@ -52,6 +58,7 @@ def convert_corpus(corpus_path, out, shuffle_corpus=False):
 	        	if parent == "Regular" or parent == "Ironic":
 	        		corpus_files.append(os.path.join(root, name))
 
+	# shuffle files
 	if shuffle_corpus == True:
 		shuffle(corpus_files)
 
@@ -63,28 +70,43 @@ def convert_corpus(corpus_path, out, shuffle_corpus=False):
 		writer.writeheader()
 
 		for file_path in corpus_files:
+			try:
+				file = open(file_path)
 
-			file = open(file_path, encoding="ISO-8859-1")
-			s = file.read()
-			data = {}
+				content = None
 
-			label = file_path.split("/")[-2]
+				try:
+					content = file.read()
+				except UnicodeDecodeError:
+					# handle encoding problems
+					file = open(file_path, encoding="ISO-8859-1")
+					content_iso = file.read()
+					content = content_iso.encode('utf-8').decode('utf-8')
 
-			if label == "Ironic":
-				data[fieldnames[0]] = 1
-			elif label == "Regular":
-				data[fieldnames[0]] = 0
-			else:
-				raise ValueError("Label Error!")
+				data = {}
 
-			data[fieldnames[1]] = file_path.split("/")[-1]
+				label = file_path.split("/")[-2]
 
-			for tag in fieldnames[2:]:
-				data[tag] = get_tag_content(tag, s)
+				if label == "Ironic":
+					data[fieldnames[0]] = 1
+				elif label == "Regular":
+					data[fieldnames[0]] = 0
+				else:
+					raise ValueError("Label Error!")
 
-			writer.writerow(data)
+				data[fieldnames[1]] = file_path.split("/")[-1]
 
-	print("Corpus written to: "+out)
+				# get all the content between xml-like tags
+				for tag in fieldnames[2:]:
+						data[tag] = get_tag_content(tag, content)
+
+				writer.writerow(data)
+
+			except ValueError:
+				# just skip files that do not match the regular file structure
+				continue	
+
+	print("Corpus as single file written to: "+out)
 
 
 def get_tag_content(tag, text):
@@ -102,6 +124,9 @@ def get_tag_content(tag, text):
 
 
 def get_lemmas(instance_pos_tags):
+	'''
+	Helper for lemmatizing tokens of corpus
+	'''
 	lemmatizer = WordNetLemmatizer()
 	pos_map = {"VB" : "v", "NN" : "n", "JJ" : "a"}
 	lemmas = []
@@ -122,17 +147,21 @@ def get_lemmas(instance_pos_tags):
 
 
 
-
 if __name__ == '__main__':
-	"""
-	corpus_path = "../corpus/SarcasmAmazonReviewsCorpus"
-	convert_corpus(corpus_path, "corpus.csv")
-	convert_corpus(corpus_path, "corpus_shuffled.csv", shuffle_corpus=True)
+	try:
+		corpus_source_path = sys.argv[1]
+		csv_out_path = sys.argv[2]
 
-	corpus = read_corpus("corpus.csv")
-	print("Corpus size: "+str(len(corpus)))
-	print(corpus[0].keys())
-	"""
+		convert_corpus(corpus_source_path, csv_out_path, shuffle_corpus=True)
+
+		corpus = read_corpus(csv_out_path)
+		print("Corpus size: "+str(len(corpus)))
+
+	except IndexError:
+		print("""Please provide following arguments:
+ $ python3 corpus.py [corpus_source] [csv_out] 
+ [corpus_source] - path to root folder of Filatrova's Review Corpus
+ [csv_out] - path and file name of csv-file to save corpus to""")
 
 
 
