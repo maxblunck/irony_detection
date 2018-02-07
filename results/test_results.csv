@@ -1,0 +1,5 @@
+classifier,features,accuracy,precision,recall,f1-score
+SVC,"['f1', 'f3', 'f4', 'f7']",0.849,0.837,0.75,0.791
+DecisionTreeClassifier,"['f1', 'f3', 'f4', 'f7']",0.841,0.818,0.75,0.783
+MultinomialNB,"['f1', 'f3', 'f4', 'f7']",0.637,0.857,0.062,0.117
+LogisticRegression,"['f1', 'f3', 'f4', 'f7']",0.833,0.838,0.698,0.761
