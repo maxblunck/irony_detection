@@ -1,4 +1,4 @@
-# Sarcasm Detection In Amazon Reviews
+# Irony Detection In Amazon Reviews
 
 ## About
 
@@ -66,7 +66,7 @@ See `config.py` itself for further options.
 ## App Structure
 
 ### Main Program
-	- main.py 							> entry point to App, calls machine_learning.py's run()-function
+	- main.py 							> entry point to app, calls machine_learning.py's run()-function
 
 ### Feature Related Files
 	- feature.py 						> provides an abstract Feature class
