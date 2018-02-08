@@ -4,7 +4,7 @@
 
 This app was developed and used for our software project (WS 17/18). 
 
-The main purpose of the programm is to use a machine learning approach to detect irony in customer reviews. When running the main programm, several classifiers are trained and evaluated.
+The main purpose of the program is to use a machine learning approach to detect irony in customer reviews. When running the main program, several classifiers are trained and evaluated.
 
 We use Elena Filatova's corpus containing ironic and non-ironic customer reviews from Amazon.com as our [data](https://github.com/ef2020/SarcasmAmazonReviewsCorpus/wiki).
 
@@ -34,7 +34,7 @@ Please note that SciPy and NumPy need to be installed before SciKit Learn.
 
 	$ source sopro_env/bin/activate
 
-To run the main programm run `main.py`.
+To run the main program run `main.py`.
 
 	$ cd src/
 	$ python3 main.py
@@ -52,7 +52,7 @@ To choose a different combination of Features, modify the following variable:
 
 	feature_selection = ['f1', 'f4', 'f7']
 
-If you'd like to run the programm for all possible combinations of the selected features, change the following variable to:
+If you'd like to run the program for all possible combinations of the selected features, change the following variable to:
 
 	use_all_variants = True
 
@@ -65,7 +65,7 @@ See `config.py` itself for further options.
 
 ## App Structure
 
-### Main Programm
+### Main Program
 	- main.py 							> entry point to App, calls machine_learning.py's run()-function
 
 ### Feature Related Files
