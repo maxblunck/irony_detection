@@ -4,13 +4,13 @@
 
 This app was developed and used for our software project (WS 17/18). 
 
-The main purpose of the programm is to use a machine learning approach to detect irony in customer reviews. When running the main programm, several classifiers are trained and evaluated.
+The main purpose of the programme is to use a machine learning approach to detect irony in customer reviews. When running the main programme, several classifiers are trained and evaluated.
 
 We use Elena Filatova's corpus containing ironic and non-ironic customer reviews from Amazon.com as our [data](https://github.com/ef2020/SarcasmAmazonReviewsCorpus/wiki).
 
 ## Setup 
 
-We suggest running the `setup.sh` file. This creates a virtual python environment and installs  all dependencies of the app.
+We suggest running the `setup.sh` file. This creates a virtual python environment and installs all dependencies of the app.
 
 	$ bash setup.sh
 
@@ -36,7 +36,7 @@ Please note that SciPy and NumPy need to be installed before SciKit Learn.
 	
 ## Run
 
-To run the main programm run `main.py`
+To run the main programme, run `main.py`
 
 	$ cd src/
 	$ python3 main.py
